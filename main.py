@@ -36,7 +36,12 @@ class ThreePartFormatPlugin(BasePlugin):
         通知不到下游插件不构成"发送失败"。
         """
         try:
-            from core.plugin.plugin_handlers import event_handler_reg, EventType
+            try:
+                # 3.0+：plugin_registry 拆分后，注册表在 core.plugin.handlers
+                from core.plugin.handlers import event_handler_reg, EventType
+            except ImportError:
+                # 2.x：旧单模块路径
+                from core.plugin.plugin_handlers import event_handler_reg, EventType
             handlers = event_handler_reg.get_handlers(EventType.ON_MESSAGE_SENT)
             if not handlers:
                 return
