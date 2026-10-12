@@ -126,6 +126,16 @@ AI 输出一条超过 100 字的纯文本消息（无标签），插件自动将
 
 ## 📝 更新日志
 
+<details>
+<summary>展开查看更新日志（当前版本：v1.0.3）</summary>
+
+### v1.0.3
+
+**3.0 兼容：`ON_MESSAGE_SENT` 补广播导入路径双形态化**：
+
+- 3.0（v3.0.0-rc.1）已删除 `core/plugin/plugin_handlers.py`（拆分为 `core/plugin/handlers.py`），旧局部导入落入兜底 except，补广播静默失效——手动转发的合并卡片对 sustained / memory / token-stats 等订阅插件不可见。现优先新路径、`ImportError` 回退旧路径（2.x 不受影响，行为零变化）。
+- 安装节补兼容性声明（KiraAI 2.33.1+ 与 3.0 全系列）。
+
 ### v1.0.2
 
 **修复与抢先发送插件（accelerator）叠加时的重复发送**（穗 ×2 + 卡片 ×2）：
@@ -135,6 +145,8 @@ AI 输出一条超过 100 字的纯文本消息（无标签），插件自动将
 - **异常路径**：发送中途失败只对**未发出**的部分降级为普通消息，已发部分不再回退重发；
 - **小坑打包**：目标 id 改从规范 sid 解析、转发节点 uin 不再默认 `"0"`、事件已停止时不再发送；
 - manifest 补 `core_version` / `icon` 字段，新增图标与守卫测试（`tests/test_no_duplicate.py`，12 断言）。
+
+</details>
 
 ---
 
