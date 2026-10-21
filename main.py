@@ -58,12 +58,17 @@ def _build_tag_pattern(starts, ends):
     任一配对都合法（如 ``[3p]…[/p]``）—— 兼容能力较弱的 LLM
     固定输错某个标签值的情况。交替项按长度降序排列（长标签优先）；
     内容仍捕获在 group(1)。任一列表为空 ⇒ 返回 None（关闭标签触发）。
+
+    结束侧取**最后一个**结束标签（贪婪）：折叠内容里提及结束标签字样
+    （如 bot 在卡片里解释自己的标签格式）不会提前截断。
+    已知取舍：「标签后的尾巴文本」里若也出现结束标签字样，会被并入卡片
+    （文字不丢失，仅从普通消息变为卡片内容）；一条消息多个折叠会合并为一张。
     """
     if not starts or not ends:
         return None
     alt_s = "|".join(re.escape(t) for t in sorted(starts, key=len, reverse=True))
     alt_e = "|".join(re.escape(t) for t in sorted(ends, key=len, reverse=True))
-    return re.compile(f"(?:{alt_s})(.*?)(?:{alt_e})", re.DOTALL)
+    return re.compile(f"(?:{alt_s})(.*)(?:{alt_e})", re.DOTALL)
 
 
 class ThreePartFormatPlugin(BasePlugin):

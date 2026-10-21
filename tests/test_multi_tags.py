@@ -176,7 +176,15 @@ m = _build(["[3p]"], ["[/3p]", "[/p]"]).search("前文[3p]内容[/p]后文")
 check("★ 交叉配对 [3p]…[/p] 合法（LLM 写错结束标签也触发）",
       m and m.group(1) == "内容")
 m = _build(["[3p]"], ["[/3p]", "[/p]"]).search("[3p]A[/p]B[/3p]")
-check("非贪婪取最近结束标签", m and m.group(1) == "A", m.group(1) if m else "无匹配")
+check("★ 贪婪取最后结束标签（内容里提到 [/p] 不会提前截断）",
+      m and m.group(1) == "A[/p]B", m.group(1) if m else "无匹配")
+m = _build(["[3p]"], ["[/3p]", "[/p]"]).search(
+    "[3p]\n我支持 [3p]…[/3p] 与 [3p]…[/p] 两种写法\n[/3p]")
+check("★ 折叠内容里自我解释标签格式（成对提及）安全",
+      m and "两种写法" in m.group(1), m.group(1) if m else "无匹配")
+m = _build(["[3p]"], ["[/3p]", "[/p]"]).search("[3p]内容[/3p] 尾巴提到[/p]而已")
+check("已知取舍：尾巴里的结束标签字样并入卡片（文字不丢，仅位置变化）",
+      m and m.group(1) == "内容[/3p] 尾巴提到", m.group(1) if m else "无匹配")
 
 print()
 print("═══ 3) 端到端：多标签 / 老配置 / 关闭触发")
